@@ -15,11 +15,15 @@ module Tarea3 where
 
 --1)
 unir:: [a] -> [a] -> [a]
-unir l1 l2 = undefined
+unir l1 [] = l1
+unir [] l2 = l2
+unir l1 l2 = l1 ++ l2
 
 --2)
 producto :: [Int] -> Int
-producto l = undefined
+producto [] = 0
+producto (x:[]) = x
+producto (x:xs) = x * producto xs
 
 --3)
 {--
