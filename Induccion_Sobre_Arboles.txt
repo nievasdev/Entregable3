@@ -1,0 +1,128 @@
+Inducción sobre Árboles
+Á. Tasistro
+La inducción, ası́ como la recursión, tiene su generalización a los variados tipos de árboles. Consideremos,
+para comenzar, árboles binarios:
+data BinTree a = Empty | Node a (BinTree a) (BinTree a).
+¿Cómo funciona en este caso la idea de “arranque y propagación”? Bueno, debemos asegurarnos de que, para
+empezar, el árbol vacı́o Empty tenga la propiedad requerida. Y, luego, el constructor Node debe preservar
+(propagar) la propiedad en cuestión. Es decir, si Node utiliza árboles que ya tuvieran la propiedad, el nuevo
+árbol resultante de la construcción debe continuar teniendo la propiedad. De ese modo, nos aseguraremos de
+que todos los árboles de tipo BinTree a cumplirán la propiedad considerada. Esto nos conduce a la siguiente
+formulación:
+Método de Demostración por Inducción en árboles binarios del tipo BinTree a :
+Sea P una propiedad de árboles binarios del tipo BinTree a. Si demostramos:
+1. Caso Base. Tesis: P Empty, y
+2. Paso Inductivo. Hipótesis: Sean izq y der árboles del tipo BinTree a que cumplen la propiedad P, es
+decir, tales que P izq y P der. Sea x de tipo a.
+Tesis: P (Node x izq der),
+entonces podemos concluir (∀t ∈ BinTree a) P t.
+Nuevamente, como en los casos de naturales y listas, lo precedente es el enunciado del método o principio
+de inducción correspondiente a este tipo de árboles. Ahora podemos proceder a aplicarlo para demostrar
+propiedades de programas. Consideremos las funciones que computan la cantidad de nodos y la altura de
+árboles dados:
+cant nodos :: BinTree a -> Integer
+cant nodos Empty = 0
+cant nodos (Node x izq der) = 1 + cant nodos izq + cant nodos der.
+altura :: BinTree a -> Integer
+altura Empty = 0
+altura (Node x izq der) = 1 + max (altura izq) (altura der).
+En altura hemos utilizado max que computa el mayor de dos enteros dados. Ahora podemos probar:
+(∀t ∈ BinTree a) cant nodos t ≥ altura t.
+La propiedad a considerar es ahora:
+P t ≡ cant nodos t ≥ altura t,
+y procedemos como de costumbre enunciando primeramente los casos a considerar:
+Caso Base. Tesis: cant nodos Empty ≥ altura Empty.
+Paso Inductivo. Hipótesis: Sean izq y der árboles del tipo BinTree a tales que cant nodos izq ≥
+altura izq y cant nodos der ≥ altura der . Sea x de tipo a.
+Tesis: cant nodos (Node x izq der) ≥ altura (Node x izq der).
+Las demostraciones son como sigue:
+Caso Base. Tesis: cant nodos Empty ≥ altura Empty.
+Demostración:
+cant nodos Empty
+= (Código de cant nodos)
+0
+1
+
+≥ (Reflexividad de ≥)
+0
+= (Código de altura)
+altura Empty
+
+Paso Inductivo. Hipótesis: Sean izq y der árboles del tipo BinTree a tales que cant nodos izq ≥
+altura izq y cant nodos der ≥ altura der . Sea x de tipo a.
+Tesis: cant nodos (Node x izq der) ≥ altura (Node x izq der).
+Demostración:
+cant nodos (Node x izq der)
+= (Código de cant nodos)
+1 + cant nodos izq + cant nodos der
+≥ (Dado que, por hipótesis, cant nodos izq ≥ altura izq y cant nodos der ≥ altura der )
+1 + altura izq + altura der
+≥ (Dado que la suma de dos naturales es mayor o igual que cualquiera de ellos, en particular, mayor o igual
+que el máximo)
+1 + max (altura izq) (altura der )
+= (Código de altura)
+altura (Node x izq der)
+
+?1.
+1. Programar cant vacios que computa la cantidad de árboles vacı́os contenidos en un árbol dado de
+tipo BinTree a.
+2. Demostrar que (∀t ∈ BinTree a) cant vacios t = 1 + cant nodos t.
+Para terminar, revisitemos los árboles de fórmulas aritméticas:
+data ExprArit = K Integer
+| N ExprArit
+| (:+) ExprArit ExprArit
+| (:*) ExprArit ExprArit.
+Nos interesa, como en todos los casos precedentes, primeramente enunciar el método de inducción correspondiente a este tipo de datos. Observamos para ello que la definición del tipo contiene:
+1. Un caso base, correspondiente al constructor K que “envuelve” un entero convirtiéndolo en una expresión.
+2. Tres casos recursivos, correspondiendo a los otros constructores. El constructor N extiende una sola
+expresión (con un signo o negación aritmética) en tanto los otros dos constructores representan los
+operadores binarios de suma y producto y, por lo tanto, arman una expresión a partir de dos árboles
+de fórmula dados.
+¿Cuál es entonces el principio de inducción correspondiente al tipo ExprArit? Bueno, si queremos demostrar
+que una propiedad P vale para todo árbol de fórmula de este tipo, es suficiente garantizar que se cumplen
+“arranque y propagación”, es decir:
+1. Que cualquiera sea el entero x dado, K x cumple P (caso base o “arranque”).
+2. Que el constructor N preserva o propaga la propiedad, es decir, que siempre que se aplique a un árbol
+de fórmula que ya tuviera la propiedad, el árbol resultante de esa aplicación también cumplirá la
+propiedad.
+2
+
+3. Y similarmente para los dos constructores binarios —en estos casos, teniendo en cuenta que es suficiente
+que la propiedad se preserve cuando los dos árboles de fórmula combinados por cada constructor la
+vengan trayendo.
+Estas consideraciones nos conducen al siguiente enunciado:
+Método de Demostración por Inducción en árboles de fórmulas del tipo ExprArit :
+Sea P una propiedad de árboles de fórmulas del tipo ExprArit. Si demostramos:
+1. Caso Base. Hipótesis: Sea x de tipo Integer.
+Tesis: P (K x),
+2. Paso Inductivo 1 (correspondiente a la negación aritmética).
+Hipótesis: Sea a un árbol de fórmula del tipo ExprArit que cumple la propiedad P, es decir, tal que
+P a.
+Tesis: P (N a),
+3. Paso Inductivo 2 (correspondiente al operador de suma).
+Sean a y b árboles de fórmula del tipo ExprArit tales que P a y P b.
+Tesis: P (a :+ b), y
+4. Paso Inductivo 3 (correspondiente al operador de producto).
+Sean a y b árboles de fórmula del tipo ExprArit tales que P a y P b.
+Tesis: P (a :* b),
+entonces podemos concluir (∀a ∈ ExprArit) P a.
+Las aplicaciones van ahora como ejercicios:
+?2.
+1. Programar espejo que computa la imagen en espejo de un árbol de fórmula del tipo ExprArit dado.
+2. Programar eval que computa el entero denotado por un árbol de fórmula del tipo ExprArit dado.
+3. Programar set, que reemplaza todos los enteros en un árbol de fórmula del tipo ExprArit, por un
+número entero dado, dejando el resto de la fórmula sin cambiar.
+4. Demostrar que:
+(a) (∀a ∈ ExprArit) espejo(espejo a) = a.
+(b) (∀a ∈ ExprArit) eval(espejo a) = eval a.
+(c) (∀a ∈ ExprArit) eval(set a 0) = 0.
+Por último, el siguiente ejercicio plantea formular el principio de inducción correspondiente a un tipo de
+datos a diseñar:
+?3.
+1. Introducir un data (tipo inductivo) para las fórmulas de Lógica Proposicional formadas a partir de
+letras (strings) por medio de la negación, conjunción y disyunción.
+2. Formular el método de demostración por inducción correspondiente al tipo precedente.
+
+3
+
+
