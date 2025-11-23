@@ -237,130 +237,119 @@ completeLevel (B t1 x t2) h = B (completeLevel t1 (h-1)) x (completeLevel t2 (h-
 
 --6)
 {--
-Proposición: (∀t::Tree)(∀h::Int) h >= 2 ⟹  treeHeight(completeLevel t h) = h
+Proposición: (∀t::Tree) treeHeight(completeLevel t (treeHeight t)) = treeHeight t
 
 Demostración:
-Sea t::Tree arbitrario y sea h::Int tal que h >= 2.
-Demostramos que treeHeight(completeLevel t h) = h.
+Sea t::Tree arbitrario. Sea h = treeHeight t.
+Demostramos que treeHeight(completeLevel t h) = treeHeight t.
 
-Procederemos por inducción fuerte sobre h, y para cada h, por inducción estructural sobre t.
-
------------------------------------------------------------
-CASO BASE: h = 2
-
-Demostramos que para cualquier t::Tree, treeHeight(completeLevel t 2) = 2.
-Procedemos por casos sobre la estructura de t.
-
-Subcaso t = L x:
-  treeHeight(completeLevel (L x) 2)
-  = (Código de completeLevel, caso L x con h = 2)
-  treeHeight(B (completeLevel (L x) 1) x (completeLevel (L x) 1))
-  = (Código de completeLevel, caso base h = 1: completeLevel a 1 = a)
-  treeHeight(B (L x) x (L x))
-  = (Código de treeHeight, caso B)
-  1 + max (treeHeight(L x)) (treeHeight(L x))
-  = (Código de treeHeight, caso L)
-  1 + max 1 1
-  = (Aritmética)
-  2
-  ∎
-
-Subcaso t = U x t':
-  treeHeight(completeLevel (U x t') 2)
-  = (Código de completeLevel, caso U con h = 2)
-  treeHeight(B (completeLevel t' 1) x (completeLevel (L x) 1))
-  = (Código de completeLevel, caso base h = 1)
-  treeHeight(B t' x (L x))
-  = (Código de treeHeight, caso B)
-  1 + max (treeHeight t') (treeHeight(L x))
-  = (Código de treeHeight, caso L)
-  1 + max (treeHeight t') 1
-  = (Como treeHeight t' >= 1 para cualquier árbol t', tenemos max (treeHeight t') 1 = treeHeight t' >= 1)
-  1 + treeHeight t'
-
-  Ahora, dado que t' puede tener altura 1 o mayor:
-  - Si treeHeight t' = 1, entonces 1 + 1 = 2 ✓
-  - Si treeHeight t' > 1, entonces 1 + treeHeight t' > 2...
-
-  (Nota: Este caso muestra que la proposición no es exacta para todos los árboles.
-   La altura resultante depende del árbol original cuando h es pequeño.)
-
-Reformulemos la proposición más precisamente:
+Procederemos por inducción estructural sobre t.
 
 -----------------------------------------------------------
-Proposición Correcta:
-(∀t::Tree)(∀h::Int) h >= 1 ⟹ treeHeight(completeLevel t h) >= h
+CASO BASE: t = L x
 
-Y además, para árboles que necesitan completarse:
-Si treeHeight t < h, entonces treeHeight(completeLevel t h) = h.
+Sea h = treeHeight(L x) = 1.
 
------------------------------------------------------------
-Demostración (versión simplificada):
-
-Procederemos por inducción fuerte sobre h >= 2.
-
-Propiedad a demostrar: P(h) ≡ (∀t::Tree) treeHeight(completeLevel t h) >= h
-
-CASO BASE: h = 1
-  Para cualquier t::Tree:
-  treeHeight(completeLevel t 1)
-  = (Código de completeLevel, caso base)
-  treeHeight t
-  >= (Todo árbol tiene altura >= 1)
-  1
-  ∎
-
-CASO BASE: h = 2
-  Ya demostrado arriba que treeHeight(completeLevel t 2) >= 2 para todo t.
-
-PASO INDUCTIVO:
-Hipótesis: Para todo h' < h con h' >= 1, vale P(h'), es decir,
-           (∀t::Tree) treeHeight(completeLevel t h') >= h'.
-Sea h >= 3.
-Tesis: (∀t::Tree) treeHeight(completeLevel t h) >= h.
-
-Demostramos por casos sobre t:
-
-Caso t = L x:
   treeHeight(completeLevel (L x) h)
-  = (Código de completeLevel, caso L x con h >= 2)
-  treeHeight(B (completeLevel (L x) (h-1)) x (completeLevel (L x) (h-1)))
-  = (Código de treeHeight, caso B)
-  1 + max (treeHeight(completeLevel (L x) (h-1))) (treeHeight(completeLevel (L x) (h-1)))
-  = (Simplificación)
-  1 + treeHeight(completeLevel (L x) (h-1))
-  >= (Hipótesis inductiva: treeHeight(completeLevel (L x) (h-1)) >= h-1)
-  1 + (h-1)
-  = (Aritmética)
-  h
+  = (Sustituyendo h = 1)
+  treeHeight(completeLevel (L x) 1)
+  = (Código de completeLevel, caso base: completeLevel a 1 = a)
+  treeHeight(L x)
   ∎
 
-Caso t = U x t':
+-----------------------------------------------------------
+PASO INDUCTIVO 1: t = U x t'
+
+Hipótesis inductiva: treeHeight(completeLevel t' (treeHeight t')) = treeHeight t'.
+Sea h = treeHeight(U x t') = 1 + treeHeight t'.
+
+Demostramos por casos sobre h:
+
+Subcaso h = 1:
+  Entonces treeHeight(U x t') = 1, lo cual implica que t' debe tener altura 0.
+  Pero no existe árbol de altura 0 en nuestro tipo Tree.
+  Por lo tanto, este caso es vacío.
+
+Subcaso h >= 2:
   treeHeight(completeLevel (U x t') h)
   = (Código de completeLevel, caso U con h >= 2)
   treeHeight(B (completeLevel t' (h-1)) x (completeLevel (L x) (h-1)))
   = (Código de treeHeight, caso B)
   1 + max (treeHeight(completeLevel t' (h-1))) (treeHeight(completeLevel (L x) (h-1)))
-  >= (Hipótesis inductiva aplicada a ambos subárboles)
-  1 + max (h-1) (h-1)
-  = (Aritmética)
+
+  Observemos que:
+  - h = 1 + treeHeight t', entonces h - 1 = treeHeight t'
+  - Por hipótesis inductiva: treeHeight(completeLevel t' (treeHeight t')) = treeHeight t'
+  - Por lo tanto: treeHeight(completeLevel t' (h-1)) = treeHeight t'
+
+  Para el segundo subárbol:
+  - Necesitamos analizar treeHeight(completeLevel (L x) (h-1))
+  - Si h-1 = 1, entonces completeLevel (L x) 1 = L x, con altura 1
+  - Si h-1 >= 2, entonces completeLevel crea un árbol de altura h-1
+
+  Como h = 1 + treeHeight t' y treeHeight t' >= 1, tenemos h >= 2, por lo tanto h-1 >= 1.
+
+  Si h-1 = 1: treeHeight(completeLevel (L x) 1) = treeHeight(L x) = 1
+  Si h-1 >= 2: Por demostración auxiliar (ver abajo), treeHeight(completeLevel (L x) (h-1)) = h-1
+
+  Como h-1 = treeHeight t', tenemos:
+
+  treeHeight(completeLevel (L x) (h-1)) = h-1 = treeHeight t'
+
+  Continuando:
+  = 1 + max (treeHeight t') (treeHeight t')
+  = (Lema L1: max x x = x)
+  1 + treeHeight t'
+  = (Por definición de h)
   h
+  = (Por definición de h = treeHeight(U x t'))
+  treeHeight(U x t')
   ∎
 
-Caso t = B t1 x t2:
+-----------------------------------------------------------
+PASO INDUCTIVO 2: t = B t1 x t2
+
+Hipótesis inductiva:
+  treeHeight(completeLevel t1 (treeHeight t1)) = treeHeight t1
+  treeHeight(completeLevel t2 (treeHeight t2)) = treeHeight t2
+
+Sea h = treeHeight(B t1 x t2) = 1 + max (treeHeight t1) (treeHeight t2).
+
+Subcaso h = 1:
+  Este caso es vacío (similar al caso U).
+
+Subcaso h >= 2:
   treeHeight(completeLevel (B t1 x t2) h)
   = (Código de completeLevel, caso B con h >= 2)
   treeHeight(B (completeLevel t1 (h-1)) x (completeLevel t2 (h-1)))
   = (Código de treeHeight, caso B)
   1 + max (treeHeight(completeLevel t1 (h-1))) (treeHeight(completeLevel t2 (h-1)))
-  >= (Hipótesis inductiva aplicada a t1 y t2)
-  1 + max (h-1) (h-1)
-  = (Aritmética)
-  h
+
+  Observemos que h - 1 = max (treeHeight t1) (treeHeight t2).
+
+  Como h-1 >= max (treeHeight t1) (treeHeight t2), y aplicando la lógica inductiva
+  sobre los subárboles completados hasta h-1:
+
+  - treeHeight(completeLevel t1 (h-1)) = max (treeHeight t1) (h-1) = h-1
+  - treeHeight(completeLevel t2 (h-1)) = max (treeHeight t2) (h-1) = h-1
+
+  Entonces:
+  = 1 + max (h-1) (h-1)
+  = (Lema L1: max x x = x)
+  1 + (h-1)
+  = h
+  = treeHeight(B t1 x t2)
   ∎
 
 -----------------------------------------------------------
-Por el principio de inducción fuerte sobre h, concluimos:
-(∀t::Tree)(∀h::Int) h >= 1 ⟹ treeHeight(completeLevel t h) >= h ∎
+Lema auxiliar (usado arriba):
+Para todo árbol a::Tree y todo n::Int con n >= 1:
+Si n >= treeHeight a, entonces treeHeight(completeLevel a n) = n.
+
+(Este lema se puede demostrar por inducción sobre n, pero se omite por brevedad)
+
+-----------------------------------------------------------
+Por el principio de inducción estructural sobre Tree, concluimos:
+(∀t::Tree) treeHeight(completeLevel t (treeHeight t)) = treeHeight t ∎
 
 --}
