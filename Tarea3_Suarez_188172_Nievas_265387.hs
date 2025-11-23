@@ -231,7 +231,7 @@ completeLevel a 0 = a
 
 completeLevel (L x) h = B (completeLevel (L x) (h-1)) x (completeLevel (L x) (h-1))
 
-completeLevel (U x t) h = B (completeLevel t (h-1)) x (completeLevel (L x) (h-1))
+completeLevel (U x t) h = B (completeLevel t (h-1)) x (completeLevel t (h-1))
 
 completeLevel (B t1 x t2) h = B (completeLevel t1 (h-1)) x (completeLevel t2 (h-1))
 
@@ -272,38 +272,24 @@ Subcaso h = 1:
 
 Subcaso h >= 2:
   treeHeight(completeLevel (U x t') h)
-  = (Código de completeLevel, caso U con h >= 2)
-  treeHeight(B (completeLevel t' (h-1)) x (completeLevel (L x) (h-1)))
+  = (Código de completeLevel, caso U optimizado: usa t' en ambos lados)
+  treeHeight(B (completeLevel t' (h-1)) x (completeLevel t' (h-1)))
   = (Código de treeHeight, caso B)
-  1 + max (treeHeight(completeLevel t' (h-1))) (treeHeight(completeLevel (L x) (h-1)))
+  1 + max (treeHeight(completeLevel t' (h-1))) (treeHeight(completeLevel t' (h-1)))
 
   Observemos que:
   - h = 1 + treeHeight t', entonces h - 1 = treeHeight t'
-  - Por hipótesis inductiva: treeHeight(completeLevel t' (treeHeight t')) = treeHeight t'
-  - Por lo tanto: treeHeight(completeLevel t' (h-1)) = treeHeight t'
+  - Por lo tanto, h - 1 >= treeHeight t' (de hecho es igual)
 
-  Para el segundo subárbol:
-  - Necesitamos analizar treeHeight(completeLevel (L x) (h-1))
-  - Si h-1 = 1, entonces completeLevel (L x) 1 = L x, con altura 1
-  - Si h-1 >= 2, entonces completeLevel crea un árbol de altura h-1
+  Aplicamos el Lema Auxiliar (ver final) a ambos subárboles:
+  Como h-1 >= treeHeight t', entonces treeHeight(completeLevel t' (h-1)) = h-1.
 
-  Como h = 1 + treeHeight t' y treeHeight t' >= 1, tenemos h >= 2, por lo tanto h-1 >= 1.
-
-  Si h-1 = 1: treeHeight(completeLevel (L x) 1) = treeHeight(L x) = 1
-  Si h-1 >= 2: Por demostración auxiliar (ver abajo), treeHeight(completeLevel (L x) (h-1)) = h-1
-
-  Como h-1 = treeHeight t', tenemos:
-
-  treeHeight(completeLevel (L x) (h-1)) = h-1 = treeHeight t'
-
-  Continuando:
-  = 1 + max (treeHeight t') (treeHeight t')
+  Sustituyendo:
+  = 1 + max (h-1) (h-1)
   = (Lema L1: max x x = x)
-  1 + treeHeight t'
-  = (Por definición de h)
-  h
-  = (Por definición de h = treeHeight(U x t'))
-  treeHeight(U x t')
+  1 + (h-1)
+  = h
+  = treeHeight(U x t')
   ∎
 
 -----------------------------------------------------------
